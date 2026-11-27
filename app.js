@@ -192,41 +192,11 @@
     $("#searchResults").innerHTML = l.length ? l.map(p => `<div class="sr-item" data-view="${p.id}"><img src="${p.images[0]}" alt="" width="56" height="68"><div><strong>${p.name}</strong><span>${p.cat} · ${money(p.price)}</span></div></div>`).join("") : `<p style="color:var(--mut)">مفيش نتايج للكلمة دي.</p>`;
   }
 
-  /* Theme selection starts dark, can be switched from both desktop and mobile, and persists. */
-  function syncThemeControls() {
-    const light = document.documentElement.getAttribute("data-theme") === "light";
-    const label = light ? "تفعيل الوضع الداكن" : "تفعيل الوضع الفاتح";
-    [$("#themeBtn"), $("#navTheme")].forEach(b => { if (b) { b.setAttribute("aria-label", label); b.title = label; if (b.id === "navTheme") b.textContent = light ? "الوضع الداكن" : "الوضع الفاتح"; } });
-    const m = document.querySelector('meta[name=theme-color]'); if (m) m.content = light ? "#e9eaee" : "#0b0b0e";
-  }
+  /* theme */
   function toggleTheme() {
     const r = document.documentElement, n = r.getAttribute("data-theme") === "light" ? "dark" : "light";
     r.setAttribute("data-theme", n); try { localStorage.setItem("zilal_theme", n); } catch (e) {}
-    syncThemeControls();
-  }
-  function initLookbook() {
-    const track = $("#lookbookTrack"), progress = $("#lookProgress"); if (!track) return;
-    const cards = $$(".look-card", track);
-    const update = () => { const max = track.scrollWidth - track.clientWidth; progress.style.width = (max <= 0 ? 100 : Math.max(33.333, (track.scrollLeft / max) * 66.667 + 33.333)) + "%"; };
-    $("#lookPrev").onclick = () => track.scrollBy({left: -track.clientWidth * .82, behavior: "smooth"});
-    $("#lookNext").onclick = () => track.scrollBy({left: track.clientWidth * .82, behavior: "smooth"});
-    track.addEventListener("scroll", update, {passive:true}); addEventListener("resize", update); update();
-    let down=false, start=0, initial=0;
-    track.addEventListener("pointerdown", e => { if(e.pointerType === "touch") return; down=true; start=e.clientX; initial=track.scrollLeft; });
-    track.addEventListener("pointerup", () => { down=false; }); track.addEventListener("pointercancel", () => { down=false; });
-    track.addEventListener("pointermove", e => { if(down){ track.scrollLeft=initial-(e.clientX-start); } });
-    track.addEventListener("keydown", e => { if(e.key==="ArrowRight") track.scrollBy({left:track.clientWidth*.8,behavior:"smooth"}); if(e.key==="ArrowLeft") track.scrollBy({left:-track.clientWidth*.8,behavior:"smooth"}); });
-  }
-  function initCountdown() {
-    let deadline; try { deadline=Number(localStorage.getItem("zilal_drop_deadline")); } catch(e) {}
-    if(!deadline || deadline < Date.now()) { deadline=Date.now()+7*24*60*60*1000; try { localStorage.setItem("zilal_drop_deadline",String(deadline)); } catch(e) {} }
-    const tick=()=>{ let left=Math.max(0,deadline-Date.now()); const d=Math.floor(left/86400000); left%=86400000; const h=Math.floor(left/3600000); left%=3600000; const m=Math.floor(left/60000); const sec=Math.floor(left%60000/1000); [["#cdDays",d],["#cdHours",h],["#cdMinutes",m],["#cdSeconds",sec]].forEach(([id,v])=>{const el=$(id);if(el)el.textContent=String(v).padStart(2,"0")}); };
-    tick(); setInterval(tick,1000);
-  }
-  function initSizeChart() {
-    const sets={hoodie:{a:"عرض الصدر",b:"الطول",c:"الكتف",rows:[["S",54,66,52],["M",57,69,55],["L",60,72,58],["XL",63,75,61]]},tee:{a:"عرض الصدر",b:"الطول",c:"الكتف",rows:[["S",50,68,45],["M",53,71,47],["L",56,74,49],["XL",59,77,51]]},pants:{a:"الوسط",b:"طول الرجل",c:"الورك",rows:[["30",76,102,98],["32",81,104,103],["34",86,106,108],["36",91,108,113]]}};
-    const render=()=>{const s=sets[$("#sizeProduct").value];$("#measureA").textContent=s.a;$("#measureB").textContent=s.b;$("#measureC").textContent=s.c;$("#sizeRows").innerHTML=s.rows.map(r=>`<tr>${r.map(v=>`<td>${v}</td>`).join("")}</tr>`).join("")};
-    $("#openSizeChart").onclick=()=>{render();openModal("sizeModal")};$("#sizeProduct").onchange=render;
+    const m = document.querySelector('meta[name=theme-color]'); if (m) m.content = n === "light" ? "#e9eaee" : "#0b0b0e";
   }
 
   document.addEventListener("click", e => {
@@ -253,7 +223,7 @@
   });
 
   function init() {
-    renderChips(); renderGrid(); renderCart(); renderWish(); syncCounters(); syncCmp(); syncThemeControls(); initLookbook(); initCountdown(); initSizeChart();
+    renderChips(); renderGrid(); renderCart(); renderWish(); syncCounters(); syncCmp();
     $("#year").textContent = new Date().getFullYear();
     $("#cartBtn").onclick = () => openDrawer("cartDrawer");
     $("#wishBtn").onclick = () => openDrawer("wishDrawer");
@@ -290,8 +260,4 @@
     if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
   }
   document.addEventListener("DOMContentLoaded", init);
-})();/* ZILAL app: cart, wishlist, compare, search, filters, WhatsApp order. */
-(function () {
-    "use strict";
-    const $ = (s, r = document) => r.querySelector(s);
-    const $$ = (s, r = document) 
+})();
