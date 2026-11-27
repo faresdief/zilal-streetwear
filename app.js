@@ -290,4 +290,8 @@
     if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
   }
   document.addEventListener("DOMContentLoaded", init);
-})();
+})();/* ZILAL app: cart, wishlist, compare, search, filters, WhatsApp order. */
+(function () {
+    "use strict";
+    const $ = (s, r = document) => r.querySelector(s);
+    const $$ = (s, r = document) 
